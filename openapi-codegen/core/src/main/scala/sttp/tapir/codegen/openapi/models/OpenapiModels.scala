@@ -137,6 +137,15 @@ object OpenapiModels {
 
   implicit val OpenapiInfoDecoder: Decoder[OpenapiInfo] = deriveDecoder[OpenapiInfo]
   implicit val OpenapiParameterDecoder: Decoder[OpenapiParameter] = deriveDecoder[OpenapiParameter]
+    .prepare { c =>
+      // default required to false if it's not stated
+      c.withFocus(
+        _.mapObject(o =>
+          if (o.contains("required")) o
+          else o.add("required", Json.fromBoolean(false))
+        )
+      )
+    }
   implicit val OpenapiPathMethodDecoder: Decoder[Seq[OpenapiPathMethod]] = { (c: HCursor) =>
     implicit val InnerDecoder: Decoder[(Seq[OpenapiParameter], Seq[OpenapiResponse], Option[OpenapiRequestBody], Option[String])] = {
       (c: HCursor) =>
