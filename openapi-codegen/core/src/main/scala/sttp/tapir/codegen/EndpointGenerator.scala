@@ -100,8 +100,10 @@ class EndpointGenerator {
           case "default" =>
             val content = resp.content.head
             s".errorOut(${contentTypeMapper(content.contentType, content.schema)})"
-          case _ =>
-            throw new NotImplementedError("Statuscode mapping is incomplete!")
+          case code if code.startsWith("2") =>
+            s".out(${contentTypeMapper(content.contentType, content.schema)} and statusCode(sttp.tapir.StatusCode($code)))"
+          case code  =>
+            s".errorOut(${contentTypeMapper(content.contentType, content.schema)} and statusCode(sttp.tapir.StatusCode($code)))"
         }
       }
       .sorted
